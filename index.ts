@@ -11,13 +11,17 @@ const { app: ewsApp } = ews(app)
 
 ewsApp.ws('/api/capture', async (ws, _) => {
   ws.on('message', async (msg: string) => {
-    const { url } = JSON.parse(msg)
+    const { url, device }: { url: string; device: 'Dekstop' | 'Mobile' } =
+      JSON.parse(msg)
     console.log(url)
+    console.log(device)
     const browser = puppeteer.launch({
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     })
     try {
       const page = await (await browser).newPage()
+
+      device === 'Mobile' && (await page.emulate(puppeteer.devices['iPhone X']))
 
       await page.goto(url.toString(), { timeout: 0 })
 
