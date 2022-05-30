@@ -23,13 +23,15 @@ const port = process.env.PORT || 4000;
 const { app: ewsApp } = (0, express_ws_1.default)(app);
 ewsApp.ws('/api/capture', (ws, _) => __awaiter(void 0, void 0, void 0, function* () {
     ws.on('message', (msg) => __awaiter(void 0, void 0, void 0, function* () {
-        const { url } = JSON.parse(msg);
+        const { url, device } = JSON.parse(msg);
         console.log(url);
+        console.log(device);
         const browser = puppeteer_1.default.launch({
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
         try {
             const page = yield (yield browser).newPage();
+            device === 'Mobile' && (yield page.emulate(puppeteer_1.default.devices['iPhone X']));
             yield page.goto(url.toString(), { timeout: 0 });
             const screenshotBuffer = (yield page.screenshot());
             const screenshot = screenshotBuffer.toString('base64');
